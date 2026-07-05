@@ -197,7 +197,7 @@ async function generateBloom(session: SessionData): Promise<MemoryDraft> {
     const lastUser =
       userMessages[userMessages.length - 1]?.content ?? "我想把这段感受先安放在这里。";
     return {
-      title: "一次被好好接住的倾诉",
+      title: lastUser.slice(0, 18) + (lastUser.length > 18 ? "..." : ""),
       dialogueSummary: userMessages
         .map((m) => m.content)
         .join("；")
@@ -205,7 +205,7 @@ async function generateBloom(session: SessionData): Promise<MemoryDraft> {
       userOneSentence: lastUser.slice(0, 40),
       recommendations: [
         {
-          title: pickRecs(1)[0]?.title || '',
+          title: lastUser.slice(0, 18) + (lastUser.length > 18 ? '...' : ''),
           reason: (pickRecs(1)[0]?.healing_logic || '').slice(0, 80),
         },
       ],
@@ -227,7 +227,7 @@ function parseBloomJson(raw: string): MemoryDraft {
   ) as Array<Record<string, unknown>>;
 
   return {
-    title: String(parsed.title ?? "一次被好好接住的倾诉").slice(0, 30),
+    title: String(parsed.title ?? "一次倾诉").slice(0, 30),
     dialogueSummary: String(parsed.dialogueSummary ?? "").slice(0, 180),
     userOneSentence: String(parsed.userOneSentence ?? "").slice(0, 80),
     recommendations: recommendations.slice(0, 3).map((r) => ({
