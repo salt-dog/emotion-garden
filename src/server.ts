@@ -1,4 +1,4 @@
-import "dotenv/config";
+﻿import "dotenv/config";
 import express from "express";
 import type { Request, Response } from "express";
 import { fileURLToPath } from "node:url";
@@ -101,8 +101,9 @@ function addMemoryRecord(memory: MemoryRecord) {
   saveMemories(memories);
 }
 
-const RAG_SEED = JSON.parse(
-  readFileSync(join(__dirname, "..", "data", "rag-materials.seed.json"), "utf-8")
+// Load RAG materials for diverse recommendations
+const RAG_SEED: any[] = JSON.parse(
+  readFileSync(join(__dirname, '..', 'data', 'rag-materials.seed.json'), 'utf-8')
 );
 
 function pickRecs(n: number): any[] {
