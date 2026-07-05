@@ -101,6 +101,20 @@ function addMemoryRecord(memory: MemoryRecord) {
   saveMemories(memories);
 }
 
+const RAG_SEED = JSON.parse(
+  readFileSync(join(__dirname, "..", "data", "rag-materials.seed.json"), "utf-8")
+);
+
+function pickRecs(n: number): any[] {
+  const arr = [...RAG_SEED];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
+
 // Plant stage helpers
 // ---------------------------------------------------------------------------
 

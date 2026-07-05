@@ -352,34 +352,26 @@ async function sendMessage() {
 }
 
 function mockAssistantResponse(text, state) {
-  const count = state.messageCount;
-  let stage = "bud";
-  let reply = "我听到了。你可以继续往下说，也可以等它慢慢形成一朵花。";
-  let canBloom = count >= 2;
-
-  if (count === 1) {
-    stage = "seed";
-    reply = "像是先把一颗种子放进土里了。可以再展开一点吗？这件事最先让你感到压力的部分是什么？";
-    canBloom = false;
-  } else if (count === 2) {
-    stage = "bud";
-    reply = "这部分开始有轮廓了。我听到的不只是事情本身，还有你在里面承受的紧绷感。你可以继续补充，也可以稍后把它整理成花。";
-  } else {
-    stage = state.stage === "bud" ? "water" : "bud";
-    const replies = [
-      "我会把这部分也放进这次记忆里。它像是在给花苞浇水，不急着结束，你还可以继续说。",
-      "这朵花还没有被强行定型。你刚刚补充的部分，让它更接近你真实的处境。",
-      "我理解这里还有一层感受：你不只是想解决事情，也想被看见、被理解。"
-    ];
-    reply = replies[(count - 3) % replies.length];
-  }
-
-  return {
-    reply,
-    stage,
-    flowStatus: canBloom ? "ready_to_bloom" : "chatting",
-    canBloom
-  };
+  var c = state.messageCount;
+  var list = [
+    `嗯，你提到${text.slice(0, 15)}…我听到了。还有吗？你可以继续说，我在这儿。`,
+    "这种感觉不轻松。谢谢你愿意说出来。",
+    "嗯，我明白了。这件事听上去确实让人不好受。",
+  ];
+  var grow = [
+    "这部分开始有轮廓了。我听到的不只是事情本身。",
+    "能感受到这件事在你心里慢慢长出了形状。",
+    "你说得很清楚，这些情绪已经有了自己的形状。",
+  ];
+  var ready = [
+    "到这里，这朵花已经有了自己的形状。你可以继续补充，也可以把它整理成花。",
+    "我能感觉到这朵花已经准备好绽放了。整理成花的按钮就在那里。",
+  ];
+  var pool = c <= 1 ? list : c <= 2 ? grow : ready;
+  var s = c <= 1 ? "seed" : c <= 2 ? "bud" : state.stage === "bud" ? "water" : "bud";
+  var canB = c >= 2;
+  var reply = pool[Math.floor(Math.random() * pool.length)];
+  return { reply: reply, stage: s, flowStatus: canB ? "ready_to_bloom" : "chatting", canBloom: canB };
 }
 
 function switchPlantStage(stage) {
@@ -418,26 +410,15 @@ async function bloomInteraction() {
 }
 
 function buildRecommendationDraft(state) {
-  const userMessages = state.messages.filter(msg => msg.role === "user").map(msg => msg.content);
-  const lastUserSentence = userMessages[userMessages.length - 1] || "我想把这段感受先安放在这里。";
-
+  var msgs = state.messages.filter(m => m.role === "user").map(m => m.content);
+  var last = msgs[msgs.length - 1] || "我想把这段感受先安放在这里。";
+  var picks = pickRandomMaterials(3);
   return {
-    title: "被压力慢慢托住的一次整理",
-    dialogueSummary: summarizeConversation(userMessages),
-    userOneSentence: lastUserSentence.slice(0, 80),
+    title: "被好好接住的一次倾诉",
+    dialogueSummary: summarizeConversation(msgs),
+    userOneSentence: last.slice(0, 80),
     flowerAsset: ASSETS.lilyCardFlower,
-    recommendations: [
-      {
-        title: "《小森林》片段：回归自然的自我疗愈",
-        reason: "适合承接那种不想被快速说服，只想先被温柔放一会儿的状态。",
-        url: "https://example.com/recommendation-1"
-      },
-      {
-        title: "一段关于整理混乱心事的散文",
-        reason: "它的节奏比较慢，更像是在陪人把很多缠在一起的感受一根一根理开。",
-        url: "https://example.com/recommendation-2"
-      }
-    ]
+    recommendations: picks.map(m => ({ title: m.t, reason: m.r, url: "" }))
   };
 }
 
