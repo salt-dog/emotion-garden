@@ -106,6 +106,9 @@ const RAG_SEED: any[] = JSON.parse(
   readFileSync(join(__dirname, '..', 'data', 'rag-materials.seed.json'), 'utf-8')
 );
 
+const FLOWER_IMAGES = ["./assets/memory/lily-card-flower.png", "./assets/interaction/flower-lily.png", "./assets/interaction/bud.png", "./assets/interaction/seed.png", "./assets/interaction/pot.png", "./assets/interaction/water.png"];
+function getFlowerImage(id: string): string { return FLOWER_IMAGES[Math.abs(id.split("").reduce(function(a: number, c: string): number { return a + c.charCodeAt(0); }, 0)) % FLOWER_IMAGES.length]; }
+
 function pickRecs(n: number): any[] {
   const arr = [...RAG_SEED];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -373,7 +376,7 @@ app.post("/api/sessions/:id/bloom", async (req: Request, res: Response) => {
     dialogueSummary: draft.dialogueSummary,
     userOneSentence: draft.userOneSentence,
     flowerType: "lily",
-    flowerAsset: "./assets/memory/lily-card-flower.png",
+    flowerAsset: getFlowerImage("m_" + Date.now()),
     recommendations: draft.recommendations,
     createdAt: new Date().toISOString(),
   };
