@@ -17,17 +17,17 @@ async function apiPost(path, body) {
 }
 
 const ASSETS = {
-  homeBg: "./assets/home/greenhouse-bg.png",
-  homeShelf: (count) => `./assets/home/shelf-state-${Math.min(count, 3)}.png`,
-  memoryBg: "./assets/memory/memory-shelf-bg.png",
-  lilyCardFlower: "./assets/memory/lily-card-flower.png",
-  workbenchBg: "./assets/interaction/workbench-bg.png",
+  homeBg: "./assets/home/greenhouse-bg.webp",
+  homeShelf: (count) => `./assets/home/shelf-state-${Math.min(count, 3)}.webp`,
+  memoryBg: "./assets/memory/memory-shelf-bg.webp",
+  lilyCardFlower: "./assets/memory/lily-card-flower.webp",
+  workbenchBg: "./assets/interaction/workbench-bg.webp",
   plant: {
-    pot: "./assets/interaction/pot.png",
-    seed: "./assets/interaction/seed.png",
-    bud: "./assets/interaction/bud.png",
-    water: "./assets/interaction/water.png",
-    flower: "./assets/interaction/flower-lily.png"
+    pot: "./assets/interaction/pot.webp",
+    seed: "./assets/interaction/seed.webp",
+    bud: "./assets/interaction/bud.webp",
+    water: "./assets/interaction/water.webp",
+    flower: "./assets/interaction/flower-lily.webp"
   }
 };
 
@@ -98,8 +98,8 @@ function renderHomePage() {
 
   app.innerHTML = `
     <main class="page home-page">
-      <img class="home-bg" src="${ASSETS.homeBg}" alt="温室主页背景" />
-      <img class="home-shelf-layer" src="${ASSETS.homeShelf(count)}" alt="花架状态" />
+      <img loading="lazy" class="home-bg" src="${ASSETS.homeBg}" alt="温室主页背景" />
+      <img loading="lazy" class="home-shelf-layer" src="${ASSETS.homeShelf(count)}" alt="花架状态" />
 
       <button class="hotspot shelf-hotspot" onclick="navigate('memory')" aria-label="进入记忆区" title="进入记忆区"></button>
       <button class="hotspot table-hotspot" onclick="startInteraction()" aria-label="进入交互区" title="进入交互区"></button>
@@ -138,7 +138,7 @@ function renderMemoryPage() {
 
   app.innerHTML = `
     <main class="page memory-page">
-      <img class="memory-bg" src="${ASSETS.memoryBg}" alt="记忆花架背景" />
+      <img loading="lazy" class="memory-bg" src="${ASSETS.memoryBg}" alt="记忆花架背景" />
       <div class="page-topbar">
         <button class="back-btn" onclick="navigate('home')">返回温室</button>
         <button class="secondary-btn" onclick="clearMemories()">清空本地记忆</button>
@@ -178,7 +178,7 @@ function renderMemoryDetailModal() {
       <button class="modal-close" onclick="closeModal()"></button>
       <div class="memory-detail-layout">
         <div>
-          <img class="memory-detail-flower" src="${memory.flowerAsset}" alt="有贺卡的百合花" />
+          <img loading="lazy" class="memory-detail-flower" src="${memory.flowerAsset}" alt="有贺卡的百合花" />
           <p class="card-hint">点击右侧卡片，可以查看正反两面。</p>
         </div>
         <div>
