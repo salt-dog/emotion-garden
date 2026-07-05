@@ -1,188 +1,103 @@
-# 渐进式知己（Progressive Confidant）
+# 情绪花园本地 Demo v2
 
-**一条随多轮对话自然流动的管线**——不做「日常吐槽 / 心理症状」意图分流，不在前两轮「精准诊断」。
+这是一个纯前端本地 demo。它没有接入真实后端和 AI API，当前使用 mock 逻辑模拟对话、开花、推荐作品和记忆保存。
 
-## 设计要点
+## 运行方式
 
-| 旧思路（已废弃） | 新思路 |
-|----------------|--------|
-| 意图开关、双链路 | 单一管线，按轮次 + 信息丰富度递进 |
-| 一两句话就判定认知偏差 | 先垫话，等用户**自己**倒出完整故事 |
-| 突然贤者模式甩金句 | 状态二才允许顺口提起一条素材 |
+方式一：直接双击 `index.html`。
 
-### 状态一 · 倾听垫话
-
-- 默认：用户前 **3** 轮发言
-- 行为：40–60 字大白话，**零**电影/歌词/哲理，**零**问号
-- 即使用户说得很严重，也先接住情绪，不越级
-
-### 状态二 · 隐喻托抱
-
-- 触发：用户**主动**给出较完整的情节 + 感受（约 ≥72 字或情境词 + 委屈细节）
-- 与轮次无关：第 1 轮若就是长段倾诉，也可进入状态二
-- 行为：可带入至多一条文化素材，仍禁止问号与心理学术语
-
-## 快速接入
-
-```ts
-import { buildChatPayload, guardResponse, stripQuestionMarks } from "progressive-confidant";
-import materials from "./data/materials.json";
-
-const history = [
-  { role: "user", content: "今天上班又被骂了，心累。" },
-];
-
-const { messages, assessment } = buildChatPayload(history, { materials });
-
-// messages[0] 为完整 system prompt（含本回合流动状态注入）
-// 将 messages 发给 OpenAI / Claude / 自建模型 API
-
-const reply = await callLLM(messages);
-const cleaned = stripQuestionMarks(reply);
-const { ok, violations } = guardResponse(cleaned, assessment.state);
-if (!ok) {
-  // 可选：带 violations 重试一轮，或强制截断/改写
-}
-```
-
-## 目录
-
-- `prompts/system.md` — 人格与红线（运行时块由代码注入）
-- `src/flow-state.ts` — 流动状态判定
-- `src/richness.ts` — 信息丰富度（非心理诊断）
-- `src/prompt-builder.ts` — 组装 system prompt
-- `src/response-guard.ts` — 输出红线校验
-- `data/materials.sample.json` — 文化素材库示例（精简 `CulturalMaterial` 形态）
-- `data/rag-materials.seed.json` — RAG 全字段示例（与生成脚本输出同结构）
-- `prompts/material-extractor.md` — 批量生成素材时用的「提取器」系统提示词
-
-## RAG 素材库自动生成
-
-仓库内已接好 **提取器提示词 → OpenAI 兼容 Chat Completions → JSON 校验 → 写入文件** 的小流水线，字段与你定义的 `RagMaterial` 一致（`theme_category`、`trigger_scene`、`core_vulnerability`、`raw_quote`、`healing_logic`）。
-
-1. 配置好根目录 `.env`（与 `npm run chat` 相同：`LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL`）。
-2. 执行：
+方式二：在本文件夹打开终端，运行：
 
 ```bash
-npm run generate-rag -- --theme=职场与学业 --count=5
+python -m http.server 8000
 ```
 
-常用参数：
+然后访问：
 
-| 参数 | 说明 |
-|------|------|
-| `--theme=` | 必填，五大板块之一（与 `THEME_CATEGORIES` 一致） |
-| `--count=` | 条数，默认 `5`，上限 `30` |
-| `--scenes=` | 可选，多个场景用 `\|` 分隔，例如 `方案被否\|怕毕不了业` |
-| `--out=` | 输出路径，默认 `data/rag-materials.generated.json` |
-| `--merge` | 与 `--out` 指向的已有文件合并（按 `title`+`raw_quote` 去重） |
-| `--no-json-mode` | 关闭 `response_format: json_object`（部分自建网关不支持时加） |
-| `--dry-run` | 只打印预览，不写文件 |
-
-生成结果接入编排层：将 JSON 读为 `RagMaterial[]`，对用户最新一轮用 `rankRagMaterials(userText, ragList)` 粗排，再 `toPromptMaterials(命中项)` 转成 `buildChatPayload` 所需的 `CulturalMaterial[]` 即可（与 README 顶部「可替换为你的向量检索，接口保持不变」一致）。
-
-## 配置 API Key 与 Base URL
-
-在项目根目录（与 `package.json` 同级）：
-
-```bash
-# 1. 复制模板
-copy .env.example .env    # Windows
-# cp .env.example .env    # macOS / Linux
-
-# 2. 编辑 .env，填入三项
+```text
+http://localhost:8000
 ```
 
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| `LLM_API_KEY` | 服务商提供的 Key | `sk-...` |
-| `LLM_BASE_URL` | OpenAI 兼容接口根路径，**含 `/v1`** | `https://api.openai.com/v1` |
-| `LLM_MODEL` | 模型名 | `gpt-4o-mini` |
+## 功能流程
 
-也支持 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_MODEL`（与常见 SDK 一致）。
+1. 进入主页，看到横屏温室场景。
+2. 点击左侧花架，进入“记忆区”。
+3. 点击右侧园艺台，进入“交互区”。
+4. 交互区中，用户可以持续输入。植物阶段为：空花盆 pot → 播种 seed → 花苞 bud → 浇水 water → 花苞 bud → 浇水 water 循环。
+5. 从第二轮输入后，页面会出现“整理成花”按钮。用户仍然可以继续输入，也可以主动开花。
+6. 点击“整理成花”后，进入百合花 flower 状态并显示推荐作品卡片。
+7. 用户确认看完后，记忆被保存到 localStorage，花回到花架，页面返回主页。
+8. 主页花架根据记忆数量显示不同差分素材，超过三朵仍显示三朵状态。
 
-**常见 Base URL：**
+## 素材替换说明
 
-| 服务商 | `LLM_BASE_URL` |
-|--------|----------------|
-| OpenAI | `https://api.openai.com/v1` |
-| DeepSeek | `https://api.deepseek.com/v1` |
-| 通义（DashScope 兼容模式） | `https://dashscope.aliyuncs.com/compatible-mode/v1` |
-| 本地 Ollama | `http://127.0.0.1:11434/v1` |
+请保持下面这些文件路径和文件名不变，直接用正式素材覆盖占位图即可。
 
-代码读取位置：`src/llm-config.ts` → `loadLlmConfig()`；请求封装在 `src/llm-client.ts`。
+```text
+assets/home/greenhouse-bg.png
+主页横屏温室背景，只含空花架底图。
 
-## 怎么验证
+assets/home/shelf-state-0.png
+主页左侧空花架透明差分素材。
 
-分两层：**不花钱的编排逻辑** + **真实模型端到端**。
+assets/home/shelf-state-1.png
+主页左侧一盆花状态透明差分素材。
 
-### ① 编排逻辑（不调 API）
+assets/home/shelf-state-2.png
+主页左侧两盆花状态透明差分素材。
 
-```bash
-cd C:\Users\Lenovo\progressive-confidant
-npm install
-npm run verify
+assets/home/shelf-state-3.png
+主页左侧三盆花状态透明差分素材。
+
+assets/memory/memory-shelf-bg.png
+记忆区完整花架特写背景。
+
+assets/memory/lily-card-flower.png
+有贺卡的百合花记忆素材。
+
+assets/interaction/workbench-bg.png
+交互区完整园艺工作台全屏背景。
+
+assets/interaction/pot.png
+空花盆阶段。
+
+assets/interaction/seed.png
+播种阶段。
+
+assets/interaction/bud.png
+发芽并出现花苞阶段。
+
+assets/interaction/water.png
+花苞浇水阶段。
+
+assets/interaction/flower-lily.png
+百合花开花阶段。
 ```
 
-自动检查：首轮短吐槽 → 状态一；严重但短 → 仍状态一；长段倾诉 → 状态二；红线校验等。
+## 占位素材尺寸建议
 
-再看各场景注入的 prompt 片段：
+主页和交互区背景建议使用 16:9 横屏，例如 1920×1080。
 
-```bash
-npm run demo
+主页花架差分素材建议使用 1920×1080 透明 PNG，与 `greenhouse-bg.png` 完全对齐。
+
+植物阶段素材建议使用透明 PNG，比例可以为 4:5 或接近竖图，代码会自动 `object-fit: contain`。
+
+记忆花素材建议使用透明 PNG，比例可以为 4:5。
+
+## 以后接后端时的接口方向
+
+当前 mock 逻辑集中在 `app.js` 中的这些函数：
+
+- `mockAssistantResponse()`：模拟 AI 对话回复和植物阶段推进。
+- `buildRecommendationDraft()`：模拟生成推荐作品和记忆草稿。
+- `completeInteraction()`：模拟保存记忆。
+
+正式接后端时，可以把这些函数替换成真实接口：
+
+```text
+POST /api/sessions
+POST /api/sessions/{session_id}/messages
+POST /api/sessions/{session_id}/bloom
+POST /api/sessions/{session_id}/complete
+GET  /api/memories
 ```
-
-### ② 真实模型回复（需 `.env`）
-
-```bash
-npm run chat
-# 或指定场景
-npm run chat -- --scenario=short
-npm run chat -- --scenario=severe
-npm run chat -- --scenario=long
-```
-
-终端会打印：**编排判定**（状态/轮次/密度）→ **模型回复** → **红线是否通过**。  
-用来肉眼确认：短场景不该出现《片名》；长场景可以自然带一句素材。
-
-### ③ 多轮真实对话模拟（交互式）
-
-```bash
-npm run live
-```
-
-启动后可直接连续输入，脚本会带着**完整历史**调用模型，更接近真实聊天流。
-
-可用命令：
-
-- `/sample short`：注入简短吐槽样例
-- `/sample severe`：注入严重但简短样例
-- `/sample long`：注入长段倾诉样例
-- `/history`：查看当前对话历史
-- `/reset`：清空当前会话
-- `/exit`：退出
-
-也支持调温度：
-
-```bash
-node examples/live-chat.mjs --temperature=0.9
-```
-
-## 本地演示（仅 prompt 预览）
-
-```bash
-cd progressive-confidant
-npm install
-npm run demo
-```
-
-## 调参
-
-- `DEFAULT_LISTENING_TURNS`（默认 3）：前几轮强制垫话
-- `richness.ts` 中字数与 `NARRATIVE_MARKERS`：控制何时视为「详细倾诉」
-- 素材匹配为关键词粗排，可替换为你的向量检索，**接口保持不变**
-
-## 与产品的关系
-
-编排层只负责：**本回合该用什么陪伴强度**。  
-「像不像老朋友」仍取决于基座模型 + `prompts/system.md`；本库避免模型在后台「算计用户该走哪条链路」。
