@@ -1,0 +1,27 @@
+{
+  "name": "progressive-confidant",
+  "version": "1.0.0",
+  "description": "多轮渐进式流动的知己对话编排 + 情绪花园 UI",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/server.js",
+    "dev": "npm run build && node dist/server.js",
+    "demo": "npm run build && node examples/demo.mjs",
+    "verify": "npm run build && node examples/verify-flow.mjs",
+    "chat": "npm run build && node examples/chat.mjs",
+    "live": "npm run build && node examples/live-chat.mjs",
+    "generate-rag": "npm run build && node examples/generate-rag-materials.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
