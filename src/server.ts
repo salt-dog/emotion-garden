@@ -288,7 +288,7 @@ app.post("/api/sessions/:id/chat", async (req: Request, res: Response) => {
     reply = await chatCompletions(payload, { temperature: 0.7, maxTokens: 512 });
   } catch (err) {
     console.error("LLM 调用失败:", err);
-    reply = "我听到了。你说的这些，我会好好收着。";
+    reply = mockAssistantReply(session.messages, userTurnCount, flowState);
   }
 
   // Guard + fix
@@ -417,6 +417,53 @@ app.get("/api/memories", (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+
+// Mock assistant reply for when no API key is configured
+function mockAssistantReply(messages: ChatMessage[], turnCount: number, flowState: string): string {
+  // Extract the last few user messages for context
+  const userMsgs = messages.filter(m => m.role === "user").map(m => m.content);
+  const lastMsg = userMsgs[userMsgs.length - 1] || "";
+  const secondLast = userMsgs[userMsgs.length - 2] || "";
+
+  // Use flow state to determine response style
+  const isListening = flowState === "listening";
+  const isResonance = flowState === "resonance";
+
+  // Responses for listening phase (state 1) - warm, open-ended, no metaphors
+  const listeningReplies = [
+    `嗯，你提到${lastMsg.slice(0, 15)}…我听到了。还有吗？你可以继续说，我在这儿。`,
+    `这种感觉不轻松。谢谢你愿意说出来。`,
+    `嗯，我明白了。这件事听上去确实让人不好受。`,
+    `是这样啊…你愿意多说一点吗？`,
+  ];
+
+  // Responses for resonance phase (state 2) - deeper, with metaphors
+  const resonanceReplies = [
+    `听起来这件事不只是表面那么简单。${secondLast ? "从" + secondLast.slice(0, 10) + "到这" : "这"}里有一种被慢慢压住的感觉，像一层一层叠起来。`,
+    `我能感觉到你在那情境里的位置——不是旁观者，是身在其中的人。`,
+    `你给自己留了这个空间来说这些，这本身就很不容易。`,
+    `这种感觉像不像你明明在往前走，但有些东西一直挂在肩上？`,
+  ];
+
+  // Bloom-ready responses
+  const readyReplies = [
+    `到这里，这朵花已经有了自己的形状。你可以继续补充，也可以把它整理成花。`,
+    `我能感觉到这朵花已经准备好了。整理成花的按钮就在那里，你自己决定什么时候绽放。`,
+  ];
+
+  // Select based on flow state and turn count
+  let pool;
+  if (turnCount >= 4 && Math.random() < 0.4) {
+    pool = readyReplies;
+  } else if (isResonance || turnCount >= 3) {
+    pool = resonanceReplies;
+  } else {
+    pool = listeningReplies;
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
 
