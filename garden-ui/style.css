@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --paper: rgba(255, 250, 240, 0.9);
   --paper-solid: #fff9ed;
   --green: #6f8f63;
@@ -694,6 +694,52 @@ button, input, textarea {
     padding: 8px 14px;
     gap: 0;
   }
+  .progress-step { padding: 3px 6px; }
+  .progress-step .step-label { font-size: 11px; }
+  .progress-line { width: 20px; }
+}
+
+/* Plant stage progress bar */
+.progress-bar {
+  position: absolute;
+  z-index: 25;
+  left: 50%;
+  top: 5%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 10px 24px;
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.82);
+  box-shadow: 0 8px 28px rgba(79, 71, 52, 0.12);
+  backdrop-filter: blur(6px);
+  user-select: none;
+}
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: all 0.35s ease;
+}
+.progress-step .step-icon { font-size: 16px; line-height: 1; }
+.progress-step .step-label { font-size: 13px; font-weight: 500; white-space: nowrap; transition: color 0.35s ease; }
+.progress-step.dim { opacity: 0.3; }
+.progress-step.active { opacity: 1; }
+.progress-step.active .step-label { color: #3f563a; font-weight: 600; }
+.progress-step.highlight { opacity: 1; background: rgba(111, 143, 99, 0.15); animation: pulse-glow 1.8s ease-in-out infinite; }
+.progress-step.highlight .step-label { color: #2d6b1a; font-weight: 700; }
+.progress-step.done { opacity: 1; background: rgba(111, 143, 99, 0.12); }
+.progress-step.done .step-label { color: #3f563a; font-weight: 600; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 127, 55, 0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(79, 127, 55, 0); }
+}
+.progress-line { width: 40px; height: 2px; background: rgba(79, 71, 52, 0.2); border-radius: 1px; }
+@media (max-width: 600px) {
+  .progress-bar { top: 4%; padding: 8px 14px; }
   .progress-step { padding: 3px 6px; }
   .progress-step .step-label { font-size: 11px; }
   .progress-line { width: 20px; }

@@ -1,4 +1,4 @@
-const app = document.getElementById("app");
+﻿const app = document.getElementById("app");
 
 // ---------- API ----------
 const API_BASE = window.location.origin;
@@ -538,6 +538,37 @@ function updateProgressBar() {
     step2.className = "progress-step dim";
     step3.className = "progress-step done";
     if (label3) label3.textContent = "已开花";
+  }
+}
+
+function updateProgressBar() {
+  var s = interaction.stage;
+  var canBloom = interaction.canBloom && interaction.flowStatus !== "flower";
+  var isFlower = interaction.flowStatus === "flower";
+  var step1 = document.getElementById("progStep1");
+  var step2 = document.getElementById("progStep2");
+  var step3 = document.getElementById("progStep3");
+  var label3 = document.getElementById("progLabel3");
+  if (!step1 || !step2 || !step3) return;
+  step1.className = "progress-step active";
+  if (s === "pot" || s === "seed") {
+    step2.className = "progress-step dim";
+    step3.className = "progress-step dim";
+    if (label3) label3.textContent = "\u5f00\u82b1";
+  } else if (s === "bud" || s === "water") {
+    step2.className = "progress-step active";
+    step3.className = "progress-step dim";
+    if (label3) label3.textContent = "\u5f00\u82b1";
+  }
+  if (canBloom) {
+    step2.className = "progress-step active";
+    step3.className = "progress-step highlight";
+    if (label3) label3.textContent = "\u53ef\u5f00\u82b1\uff01";
+  }
+  if (isFlower) {
+    step2.className = "progress-step dim";
+    step3.className = "progress-step done";
+    if (label3) label3.textContent = "\u5df2\u5f00\u82b1";
   }
 }
 
