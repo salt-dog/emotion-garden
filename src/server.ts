@@ -202,8 +202,8 @@ async function generateBloom(session: SessionData): Promise<MemoryDraft> {
       userOneSentence: lastUser.slice(0, 40),
       recommendations: [
         {
-          title: "《小森林》片段",
-          reason: "回归简单生活，给自己一个安静的呼吸空间。",
+          title: pickRecs(1)[0]?.title || '',
+          reason: (pickRecs(1)[0]?.healing_logic || '').slice(0, 80),
         },
       ],
     };
