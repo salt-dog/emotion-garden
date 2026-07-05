@@ -17,9 +17,6 @@ async function apiPost(path, body) {
   return res.json();
 }
 
-var FLOWER_IMAGES=[ASSETS.lilyCardFlower,ASSETS.plant.flower,ASSETS.plant.bud,ASSETS.plant.seed,ASSETS.plant.pot,ASSETS.plant.water];
-function pickFlowerImg(id){return FLOWER_IMAGES[Math.abs(id.split('').reduce(function(a,c){return a+c.charCodeAt(0)},0))%FLOWER_IMAGES.length]}
-
 const ASSETS = {
   homeBg: "./assets/home/greenhouse-bg.webp",
   homeShelf: (count) => `./assets/home/shelf-state-${Math.min(count, 3)}.webp`,
@@ -409,7 +406,7 @@ function buildRecommendationDraft(state) {
     title: '被好好接住的一次倾诉',
     dialogueSummary: summarizeConversation(msgs),
     userOneSentence: last.slice(0, 80),
-    flowerAsset: pickFlowerImg(last),
+    flowerAsset: [ASSETS.lilyCardFlower,ASSETS.plant.flower,ASSETS.plant.bud,ASSETS.plant.seed,ASSETS.plant.pot,ASSETS.plant.water][Math.floor(Math.random()*6)],
     recommendations: picks.map(function(m) { return { title: m.t, reason: m.r, url: '' }; })
   };
 }
@@ -467,7 +464,7 @@ function completeInteraction() {
     dialogueSummary: recommendationDraft.dialogueSummary,
     userOneSentence,
     flowerType: "lily",
-    flowerAsset: recommendationDraft.flowerAsset || pickFlowerImg(recommendationDraft.id || 'm_'+Date.now()),
+    flowerAsset: recommendationDraft.flowerAsset || [ASSETS.lilyCardFlower,ASSETS.plant.flower,ASSETS.plant.bud,ASSETS.plant.seed,ASSETS.plant.pot,ASSETS.plant.water][Math.floor(Math.random()*6)],
     recommendations: (recommendationDraft.recommendations || []).map(r => ({
       title: r.title,
       reason: r.reason,
