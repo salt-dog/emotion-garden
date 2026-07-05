@@ -403,7 +403,7 @@ function buildRecommendationDraft(state) {
   var last = msgs[msgs.length - 1] || '我想把这段感受先安放在这里。';
   var picks = pickRandomMaterials(3);
   return {
-    title: '被好好接住的一次倾诉',
+    title: (last.slice(0, 18) + (last.length > 18 ? '...' : '')) || '一次倾诉',
     dialogueSummary: summarizeConversation(msgs),
     userOneSentence: last.slice(0, 80),
     flowerAsset: [ASSETS.lilyCardFlower,ASSETS.plant.flower,ASSETS.plant.bud,ASSETS.plant.seed,ASSETS.plant.pot,ASSETS.plant.water][Math.floor(Math.random()*6)],
