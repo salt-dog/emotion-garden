@@ -261,6 +261,15 @@ function renderInteractionPage() {
         <button class="back-btn" onclick="confirmLeaveInteraction()">返回温室</button>
       </div>
 
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-step" id="progStep1"><span class="step-icon">🌱</span><span class="step-label">倾诉</span></div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="progStep2"><span class="step-icon">🌿</span><span class="step-label">生长</span></div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="progStep3"><span class="step-icon">🌸</span><span class="step-label" id="progLabel3">开花</span></div>
+      </div>
+      </div>
+
       <section class="dialog-box">
         <div id="chatList" class="chat-list">
           ${interaction.messages.map(msg => `
@@ -419,7 +428,7 @@ function buildRecommendationDraft(state) {
     flowerAsset: ASSETS.lilyCardFlower,
     recommendations: [
       {
-        title: "《海街日记》片段：安静生活中的缓慢修复",
+        title: "《小森林》片段：回归自然的自我疗愈",
         reason: "适合承接那种不想被快速说服，只想先被温柔放一会儿的状态。",
         url: "https://example.com/recommendation-1"
       },
@@ -570,6 +579,22 @@ function updateProgressBar() {
     step3.className = "progress-step done";
     if (label3) label3.textContent = "\u5df2\u5f00\u82b1";
   }
+}
+
+function updateProgressBar() {
+  var s = interaction.stage;
+  var canBloom = interaction.canBloom && interaction.flowStatus !== "flower";
+  var isFlower = interaction.flowStatus === "flower";
+  var s1 = document.getElementById("progStep1");
+  var s2 = document.getElementById("progStep2");
+  var s3 = document.getElementById("progStep3");
+  var l3 = document.getElementById("progLabel3");
+  if (!s1||!s2||!s3) return;
+  s1.className = "progress-step active";
+  if (s === "pot" || s === "seed") { s2.className = "progress-step dim"; s3.className = "progress-step dim"; if (l3) l3.textContent = "开花"; }
+  else if (s === "bud" || s === "water") { s2.className = "progress-step active"; s3.className = "progress-step dim"; if (l3) l3.textContent = "开花"; }
+  if (canBloom) { s2.className = "progress-step active"; s3.className = "progress-step highlight"; if (l3) l3.textContent = "可开花！"; }
+  if (isFlower) { s2.className = "progress-step dim"; s3.className = "progress-step done"; if (l3) l3.textContent = "已开花"; }
 }
 
 function escapeHtml(value) {
